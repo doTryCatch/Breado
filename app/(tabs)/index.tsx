@@ -17,7 +17,7 @@ import bakeryProducts from "@/constants/product_data";
 import { useAuth } from "@/middleware/auth";
 export default function App() {
   const { isLoggedIn } = useAuth();
-  const router = useRoute();
+  // const router = useRoute();
   const [activeCategory, setActiveCategory] = useState("Cake");
   const categories = [
     { name: "Cake", icon: "🍰" },
@@ -142,7 +142,7 @@ export default function App() {
         {Object.entries(bakeryProducts).map(([category, products], index) => (
           <View
             key={index}
-            className={"mb-8 " + (activeCategory == category ? "" : " hidden")}
+            className={"mb-8 " + (activeCategory === category ? "" : " hidden")}
           >
             {/* Category Heading */}
             <Text className="text-xl font-bold text-gray-800 mb-4">

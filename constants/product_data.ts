@@ -1,4 +1,4 @@
-const bakeryProducts = {
+export const bakeryProducts = {
   Cake: [
     {
       name: "Chocolate Cake",
@@ -85,4 +85,3 @@ const bakeryProducts = {
     },
   ],
 };
-export default bakeryProducts;

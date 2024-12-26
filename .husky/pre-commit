@@ -1,1 +1,5 @@
+npx eslint . || {
+echo "❌ Eslint test Failed: Please fix the eslint error to proceed on commit!!";
+exit 1;
+}
 echo "everthing is ok. no restriction for commit. ready to commit!!!"

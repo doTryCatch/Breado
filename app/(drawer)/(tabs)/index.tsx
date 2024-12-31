@@ -1,6 +1,4 @@
 import React, { useState } from "react";
-import { useRoute } from "@react-navigation/native";
-import { Link } from "expo-router";
 import { Avatar } from "react-native-elements";
 import {
   View,
@@ -11,13 +9,16 @@ import {
   Image,
   StatusBar,
 } from "react-native";
+import { useNavigation, useRouter } from "expo-router";
+import { DrawerActions } from "@react-navigation/native";
 import { Ionicons, Feather, AntDesign } from "@expo/vector-icons";
-import { images } from "../../constants";
-import bakeryProducts from "@/constants/product_data";
+import { images } from "@/constants";
+import { bakeryProducts } from "@/constants";
 import { useAuth } from "@/middleware/auth";
 export default function App() {
   const { isLoggedIn } = useAuth();
-  // const router = useRoute();
+  const navigator = useNavigation();
+  const router = useRouter();
   const [activeCategory, setActiveCategory] = useState("Cake");
   const categories = [
     { name: "Cake", icon: "🍰" },
@@ -35,13 +36,17 @@ export default function App() {
         translucent={false}
       />
       <View className="flex-row justify-between items-center mb-4">
-        <Ionicons name="menu" size={28} color="black" />
+        <TouchableOpacity
+          onPress={() => navigator.dispatch(DrawerActions.openDrawer())}
+        >
+          <Ionicons name="menu" size={28} color="black" />
+        </TouchableOpacity>
         <View className="relative flex-row gap-4">
           <Ionicons name="cart-outline" size={28} color="black" />
           <View className="login justify-centeri items-center">
-            <TouchableOpacity>
-              {" "}
-              {!isLoggedIn ? (
+            {" "}
+            {isLoggedIn ? (
+              <TouchableOpacity>
                 <View className="h-12 w-12 rounded-[100%] border border-solid border-black   items-center justify-center -mt-2">
                   <Avatar
                     rounded
@@ -51,12 +56,12 @@ export default function App() {
                     }}
                   />
                 </View>
-              ) : (
-                <Link href="/sign_in" className="bg-white  p-2 rounded-md">
-                  <Text>Login</Text>
-                </Link>
-              )}
-            </TouchableOpacity>
+              </TouchableOpacity>
+            ) : (
+              <TouchableOpacity onPress={() => router.push("sign_in")}>
+                <Text className="bg-white  p-2 rounded-md">Login</Text>
+              </TouchableOpacity>
+            )}
           </View>
           <View className="absolute top-0 right-0 bg-orange-400 rounded-full w-3 h-3" />
         </View>
@@ -139,44 +144,50 @@ export default function App() {
           ))}
         </ScrollView>
         {/* Popular Cakes Section */}
-        {Object.entries(bakeryProducts).map(([category, products], index) => (
-          <View
-            key={index}
-            className={"mb-8 " + (activeCategory === category ? "" : " hidden")}
-          >
-            {/* Category Heading */}
-            <Text className="text-xl font-bold text-gray-800 mb-4">
-              {category}
-            </Text>
+        {Object.entries(bakeryProducts || {}).map(
+          ([category, products], index) => (
+            <View
+              key={index}
+              className={
+                "mb-8 " + (activeCategory === category ? "" : " hidden")
+              }
+            >
+              {/* Category Heading */}
+              <Text className="text-xl font-bold text-gray-800 mb-4">
+                {category}
+              </Text>
 
-            {/* Products List */}
-            <View className="product flex flex-row flex-wrap gap-4">
-              {products.map((product, productIndex) => (
-                <View
-                  key={productIndex}
-                  className="bg-white p-4 rounded-lg shadow-sm w-[48%]"
-                >
-                  <Text className="text-lg font-semibold text-gray-900">
-                    {product.name}
-                  </Text>
-                  <Text className="text-sm text-gray-600 mb-2">
-                    {product.description}
-                  </Text>
-                  <Text className="text-sm text-gray-600">
-                    Price: ${product.price}
-                  </Text>
-                  <Text className="text-sm text-gray-600">
-                    Calories: {product.calories}
-                  </Text>
-                  <Text className="text-sm text-gray-600">
-                    Weight: {product.weight}
-                  </Text>
-                </View>
-              ))}
+              {/* Products List */}
+              <View className="product flex flex-row flex-wrap gap-4">
+                {products.map((product, productIndex: number) => (
+                  <TouchableOpacity
+                    onPress={() => router.push(`product/id=${productIndex}`)}
+                    className="bg-white p-4 rounded-lg shadow-sm w-[48%]"
+                    key={productIndex}
+                  >
+                    <View>
+                      <Text className="text-lg font-semibold text-gray-900">
+                        {product.name}
+                      </Text>
+                      <Text className="text-sm text-gray-600 mb-2">
+                        {product.description}
+                      </Text>
+                      <Text className="text-sm text-gray-600">
+                        Price: ${product.price}
+                      </Text>
+                      <Text className="text-sm text-gray-600">
+                        Calories: {product.calories}
+                      </Text>
+                      <Text className="text-sm text-gray-600">
+                        Weight: {product.weight}
+                      </Text>
+                    </View>
+                  </TouchableOpacity>
+                ))}
+              </View>
             </View>
-          </View>
-        ))}{" "}
-        {/* Placeholder for popular cakes */}
+          ),
+        )}
       </ScrollView>
     </View>
   );

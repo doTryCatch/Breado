@@ -1,23 +1,38 @@
-import React from "react";
+import React, { useState } from "react";
 import { View, Text, TextInput, TouchableOpacity } from "react-native";
 import axios from "axios";
+import { API } from "@/config";
 import { useAuth } from "@/middleware/auth";
+import { useRouter } from "expo-router";
 const Login = () => {
-  const { logIn } = useAuth();
+  const router = useRouter();
+  const { logIn, loadUserData } = useAuth();
+  const [loginCredentials, setLoginCredentials] = useState({
+    phone: "",
+    password: "",
+  });
+
+  const [errorMsg, setErrorMsg] = useState("");
   const handleLogin = async () => {
-    console.log("login handler is active");
+    console.log("login handler is active " + loginCredentials.phone);
+
     try {
-      const response = await axios.post(
-        "https://d495-103-232-154-95.ngrok-free.app/auth/login",
-        { email: "rp207045@gmail.com", password: "roshan12##" },
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-          withCredentials: true, // Ensures cookies are sent and received
+      const response = await axios.post(API.LOGIN, loginCredentials, {
+        headers: {
+          "Content-Type": "application/json",
         },
-      );
-      if (response.data.success) logIn();
+        withCredentials: true, // Ensures cookies are sent and received
+      });
+      if (response.data.success) {
+        setErrorMsg("login successfull!!");
+        setTimeout(() => {
+          setErrorMsg("");
+          router.push("/");
+        }, 1000);
+
+        loadUserData(response.data.data);
+        logIn();
+      }
       console.log("Login successful:", response.data);
     } catch (error) {
       console.error("Error logging in:", error.response?.data || error.message);
@@ -26,29 +41,41 @@ const Login = () => {
 
   return (
     <View className="flex-1 bg-[#F3F3F4] items-center justify-center px-5">
+      {errorMsg !== "" && (
+        <View className="p-4 bg-white text-red-800">
+          <Text>{errorMsg}</Text>
+        </View>
+      )}
       {/* Logo */}
       <View className="mb-10">
         <Text className="text-4xl font-bold text-[#FF9F0A]">Breado</Text>
       </View>
-
       {/* Title */}
       <Text className="text-lg text-gray-800 mb-5">Log in to Breado</Text>
-
       {/* Email Input */}
       <TextInput
         className="w-full bg-white p-4 rounded-lg mb-4 text-base text-gray-800 shadow-md"
         placeholder="Email"
+        value={loginCredentials.phone}
         placeholderTextColor="#B3B3B3"
+        onChangeText={(text) =>
+          setLoginCredentials({
+            ...loginCredentials,
+            phone: text,
+          })
+        }
       />
-
       {/* Password Input */}
       <TextInput
         className="w-full bg-white p-4 rounded-lg mb-4 text-base text-gray-800 shadow-md"
         placeholder="Password"
         placeholderTextColor="#B3B3B3"
-        secureTextEntry
+        value={loginCredentials.password}
+        onChangeText={(text) =>
+          setLoginCredentials({ ...loginCredentials, password: text })
+        }
+        secureTextEntry={true}
       />
-
       {/* Sign In Button */}
       <TouchableOpacity
         className="w-full bg-[#FF9F0A] p-4 rounded-lg items-center mb-5"
@@ -56,12 +83,13 @@ const Login = () => {
       >
         <Text className="text-white text-base font-bold">Sign In</Text>
       </TouchableOpacity>
-
       {/* Sign Up Text */}
-      <Text className="text-sm text-gray-600">
+      <Text style={{ fontSize: 14, color: "gray" }}>
         Don't have an account?{" "}
-        <Text className="text-[#FF9F0A] font-bold">Signup</Text>
-      </Text>
+        <TouchableOpacity onPress={() => router.push("/sign_up")}>
+          <Text style={{ color: "#FF9F0A", fontWeight: "bold" }}>Sign Up</Text>
+        </TouchableOpacity>
+      </Text>{" "}
     </View>
   );
 };

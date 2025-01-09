@@ -1,6 +1,7 @@
 import React from "react";
 import { View, Text, Image, TouchableOpacity, ScrollView } from "react-native";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
+import { useAuth } from "@/middleware/auth";
 const MenuItem = ({ icon, label, badgeCount }) => (
   <TouchableOpacity className="flex-row items-center justify-between bg-white p-4 mb-3 rounded-lg shadow-md">
     <View className="flex-row items-center space-x-3">
@@ -15,6 +16,7 @@ const MenuItem = ({ icon, label, badgeCount }) => (
   </TouchableOpacity>
 );
 export default function ProfileScreen() {
+  const { user } = useAuth();
   return (
     <View className="flex-1 bg-orange-50">
       {/* Header Section */}
@@ -30,10 +32,8 @@ export default function ProfileScreen() {
           source={{ uri: "https://example.com/profile.jpg" }} // Replace with actual profile image URL
           className="w-20 h-20 rounded-full border-2 border-white"
         />
-        <Text className="text-lg font-bold text-white mt-3">
-          Naila Stefenson
-        </Text>
-        <Text className="text-base text-orange-200">UX/UI Designer</Text>
+        <Text className="text-lg font-bold text-white mt-3">{user.name}</Text>
+        <Text className="text-base text-orange-200">{user.role}</Text>
       </View>
 
       {/* Menu Section */}

@@ -8,6 +8,7 @@ import {
   Alert,
   Modal,
   ActivityIndicator,
+  Image,
 } from "react-native";
 import axios from "axios";
 import { Ionicons } from "@expo/vector-icons"; // Add expo icons for the add icon
@@ -19,15 +20,16 @@ interface ProductRecord {
   product_id: number;
   name: string;
   price: number;
-  category: string;
-  description: string;
+  image: string; // Assuming each product has an image URL
 }
+
 interface Product {
   name: string;
   price: number;
   category: string;
   description: string;
 }
+
 export default function AllProducts() {
   const { getCacheData, setCacheData } = useCache();
   const [products, setProducts] = useState<ProductRecord[]>([]);
@@ -134,51 +136,55 @@ export default function AllProducts() {
       ) : (
         <ScrollView
           alwaysBounceVertical
-          className="flex-1 p-4 max-h-[85vh] "
+          className="flex-1 p-4 max-h-[85vh]"
           showsVerticalScrollIndicator={false}
         >
           {products.map((product) => (
             <View
               key={product.product_id}
-              className="bg-white p-4 mb-4 rounded-lg shadow-md"
+              className="bg-white p-4 mb-4 rounded-lg shadow-md flex-row items-center"
             >
-              <Text className="text-lg font-semibold text-gray-800">
-                {product.name}
-              </Text>
-              <Text className="text-sm text-gray-600">
-                Category: {product.category}
-              </Text>
-              <Text className="text-sm text-gray-600">
-                Description: {product.description}
-              </Text>
-              <Text className="text-lg font-semibold text-gray-800">
-                Price: ${product.price}
-              </Text>
+              <View className="flex-1">
+                <Text className="text-lg font-semibold text-gray-800">
+                  {product.name}
+                </Text>
+                <Text className="text-lg font-semibold text-gray-800">
+                  ${product.price}
+                </Text>
 
-              <TouchableOpacity
-                onPress={() => setEditingProduct(product.product_id)}
-                className="bg-yellow-500 p-2 rounded-lg mt-2"
-              >
-                <Text className="text-white text-center">Edit Price</Text>
-              </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => setEditingProduct(product.product_id)}
+                  className="bg-yellow-500 p-2 rounded-lg mt-2"
+                >
+                  <Text className="text-white text-center">Edit Price</Text>
+                </TouchableOpacity>
 
-              {editingProduct === product.product_id && (
-                <View className="mt-4">
-                  <TextInput
-                    value={updatedPrice}
-                    onChangeText={setUpdatedPrice}
-                    placeholder="Enter new price"
-                    keyboardType="numeric"
-                    className="border border-gray-300 rounded-lg p-3 mb-4 text-gray-700"
-                  />
-                  <TouchableOpacity
-                    onPress={() => handleUpdatePrice(product.product_id)}
-                    className="bg-green-500 p-3 rounded-lg"
-                  >
-                    <Text className="text-white text-center">Update Price</Text>
-                  </TouchableOpacity>
-                </View>
-              )}
+                {editingProduct === product.product_id && (
+                  <View className="mt-4">
+                    <TextInput
+                      value={updatedPrice}
+                      onChangeText={setUpdatedPrice}
+                      placeholder="Enter new price"
+                      keyboardType="numeric"
+                      className="border border-gray-300 rounded-lg p-3 mb-4 text-gray-700"
+                    />
+                    <TouchableOpacity
+                      onPress={() => handleUpdatePrice(product.product_id)}
+                      className="bg-green-500 p-3 rounded-lg"
+                    >
+                      <Text className="text-white text-center">
+                        Update Price
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                )}
+              </View>
+
+              <Image
+                source={{ uri: product.image }}
+                className="w-24 h-24 ml-4 rounded-lg"
+                resizeMode="cover"
+              />
             </View>
           ))}
         </ScrollView>

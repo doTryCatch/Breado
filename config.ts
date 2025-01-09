@@ -12,6 +12,11 @@ export const API = {
   addProduct: `${BASE_URL}/product/add`,
   deleteProduct: `${BASE_URL}/product/delete`,
   updateProduct: `${BASE_URL}/product/update`,
+  createOrder: `${BASE_URL}/orders/create`,
+  paymentForOrder: `${BASE_URL}/orders/paymentDeposit`,
+  getAllExpense: `${BASE_URL}/records/expenseOverview`,
+  getOrderStat: `${BASE_URL}/records/getOrderStat`,
+  addExpense: `${BASE_URL}/expense/add`,
   // Add more endpoints as needed
 };
 

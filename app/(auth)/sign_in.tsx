@@ -1,5 +1,11 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity } from "react-native";
+import {
+  View,
+  ActivityIndicator,
+  Text,
+  TextInput,
+  TouchableOpacity,
+} from "react-native";
 import axios from "axios";
 import { API } from "@/config";
 import { useAuth } from "@/middleware/auth";
@@ -7,6 +13,7 @@ import { useRouter } from "expo-router";
 const Login = () => {
   const router = useRouter();
   const { logIn, loadUserData } = useAuth();
+  const [isloading, setIsloading] = useState(false);
   const [loginCredentials, setLoginCredentials] = useState({
     phone: "",
     password: "",
@@ -14,7 +21,7 @@ const Login = () => {
 
   const [errorMsg, setErrorMsg] = useState("");
   const handleLogin = async () => {
-    console.log("login handler is active " + loginCredentials.phone);
+    setIsloading(true);
 
     try {
       const response = await axios.post(API.LOGIN, loginCredentials, {
@@ -23,8 +30,9 @@ const Login = () => {
         },
         withCredentials: true, // Ensures cookies are sent and received
       });
+      setErrorMsg(response.data.message);
       if (response.data.success) {
-        setErrorMsg("login successfull!!");
+        setIsloading(false);
         setTimeout(() => {
           setErrorMsg("");
           router.push("/");
@@ -40,10 +48,16 @@ const Login = () => {
   };
 
   return (
-    <View className="flex-1 bg-[#F3F3F4] items-center justify-center px-5">
-      {errorMsg !== "" && (
+    <View className="flex-1 mb-5 bg-[#F3F3F4] items-center justify-center px-5">
+      {errorMsg && (
         <View className="p-4 bg-white text-red-800">
           <Text>{errorMsg}</Text>
+        </View>
+      )}
+      {!errorMsg && isloading && (
+        <View className="flex-1 justify-center items-center bg-gray-100">
+          <ActivityIndicator size="large" color="#FF6347" />
+          <Text className="mt-4 text-gray-700">logging In...</Text>
         </View>
       )}
       {/* Logo */}
@@ -55,7 +69,8 @@ const Login = () => {
       {/* Email Input */}
       <TextInput
         className="w-full bg-white p-4 rounded-lg mb-4 text-base text-gray-800 shadow-md"
-        placeholder="Email"
+        placeholder="Enter Phone Number"
+        keyboardType="numeric"
         value={loginCredentials.phone}
         placeholderTextColor="#B3B3B3"
         onChangeText={(text) =>

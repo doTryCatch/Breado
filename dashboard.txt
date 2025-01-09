@@ -1,0 +1,245 @@
+import React, { useEffect, useState } from "react";
+import {
+  View,
+  Text,
+  ScrollView,
+  Button,
+  ActivityIndicator,
+} from "react-native";
+import axios from "axios";
+import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import { BarChart } from "react-native-chart-kit";
+import { ProgressBar } from "react-native-paper";
+import { API } from "@/config";
+import { useNetwork } from "@/middleware/network";
+
+interface ExpenseGroupedByDate {
+  date: string;
+  amount: number;
+}
+
+interface ExpenseGroupedByName {
+  name: string;
+  amount: number;
+}
+
+interface OrderStat {
+  date: string;
+  totalPrice: number;
+  totalDeposit: number;
+  totalRemaining: number;
+}
+
+interface TotalExpense {
+  totalExpense: number;
+}
+
+const safeDivide = (numerator: number, denominator: number): number =>
+  denominator > 0 ? parseFloat(numerator / denominator).toFixed : 0;
+
+const Dashboard = () => {
+  const [orderStats, setOrderStats] = useState<OrderStat[]>([]);
+  const [expensesGroupedByDate, setExpensesGroupedByDate] = useState<
+    ExpenseGroupedByDate[]
+  >([]);
+  const [expensesGroupedByName, setExpensesGroupedByName] = useState<
+    ExpenseGroupedByName[]
+  >([]);
+  const [totalExpenseTillDate, setTotalExpenseTillDate] =
+    useState<TotalExpense | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const { isConnected } = useNetwork();
+
+  useEffect(() => {
+    const fetchDataStats = async () => {
+      try {
+        const orderStat = await axios.get(API.getOrderStat, {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          withCredentials: true,
+        });
+        setOrderStats(orderStat.data);
+
+        const response = await axios.get(API.getAllExpense, {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          withCredentials: true,
+        });
+
+        setExpensesGroupedByDate(response.data.expensesGroupedByDate || []);
+        setExpensesGroupedByName(response.data.expensesGroupedByName || []);
+        setTotalExpenseTillDate(response.data.totalExpenseTillDate || null);
+        setError(null);
+      } catch (error) {
+        setError("Failed to load expense data. Please try again.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (isConnected) {
+      fetchDataStats();
+    }
+  }, [isConnected]);
+
+  if (!isConnected) {
+    return (
+      <View className="flex-1 justify-center items-center bg-gray-100">
+        <Icon name="wifi-off" size={64} color="#9ca3af" />
+        <Text className="text-lg font-bold text-gray-800 mt-4">
+          No Internet Connection
+        </Text>
+        <Text className="text-sm text-gray-600 text-center mt-2">
+          Please check your connection and try again.
+        </Text>
+      </View>
+    );
+  }
+
+  if (loading) {
+    return (
+      <View className="flex-1 justify-center items-center bg-gray-100">
+        <ActivityIndicator size="large" color="#4f46e5" />
+        <Text className="text-sm text-gray-600 mt-2">Loading...</Text>
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View className="flex-1 justify-center items-center bg-gray-100">
+        <Text className="text-red-600 text-base">{error}</Text>
+        <Button title="Retry" onPress={() => setLoading(true)} />
+      </View>
+    );
+  }
+
+  const dates = expensesGroupedByDate.map((item) =>
+    new Date(item.date).toLocaleDateString(),
+  );
+  const amounts = expensesGroupedByDate.map((item) => item.amount);
+
+  return (
+    <ScrollView className="flex-1 p-4 bg-gray-100">
+      <View className="p-4 bg-white shadow-md rounded-md">
+        <Text className="text-xl font-bold text-gray-800">
+          Expense Dashboard
+        </Text>
+      </View>
+
+      {/* Order Stats */}
+      <View className="mt-6">
+        <Text className="text-lg font-semibold text-gray-800">
+          Order Statistics
+        </Text>
+        {orderStats.length > 0 ? (
+          orderStats.map((stat, index) => (
+            <View
+              key={index}
+              className="bg-white p-4 rounded-md shadow-md mt-4"
+            >
+              <Text className="font-bold text-gray-700">
+                Date: {new Date(stat.date).toLocaleDateString()}
+              </Text>
+              <Text className="text-gray-700">
+                Total Price: ${stat.totalPrice}
+              </Text>
+              <Text className="text-gray-700">
+                Deposit: ${stat.totalDeposit} (Paid)
+              </Text>
+              <Text className="text-gray-700">
+                Remaining: ${stat.totalRemaining}
+              </Text>
+              <ProgressBar
+                progress={safeDivide(stat.totalDeposit, stat.totalPrice)}
+                color="#4f46e5"
+                className="mt-2 h-2 rounded-full"
+              />
+            </View>
+          ))
+        ) : (
+          <Text className="text-gray-600 mt-2">
+            No order statistics available.
+          </Text>
+        )}
+      </View>
+
+      {/* Expenses Grouped By Date */}
+      <View className="mt-6">
+        <Text className="text-lg font-semibold text-gray-800">
+          Expenses Grouped By Date
+        </Text>
+        {expensesGroupedByDate.length > 0 ? (
+          <BarChart
+            data={{
+              labels: dates,
+              datasets: [{ data: amounts }],
+            }}
+            width={Dimensions.get("window").width - 32}
+            height={220}
+            chartConfig={{
+              backgroundColor: "#ffffff",
+              backgroundGradientFrom: "#ffffff",
+              backgroundGradientTo: "#ffffff",
+              decimalPlaces: 0,
+              color: (opacity = 1) => `rgba(134, 65, 244, ${opacity})`,
+              labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+            }}
+            style={{ marginVertical: 8, borderRadius: 16 }}
+          />
+        ) : (
+          <Text className="text-gray-600 mt-2">
+            No data available to display chart.
+          </Text>
+        )}
+      </View>
+
+      {/* Expenses Grouped By Name */}
+      <View className="mt-6">
+        <Text className="text-lg font-semibold text-gray-800">
+          Expenses Grouped By Name
+        </Text>
+        {expensesGroupedByName.length > 0 ? (
+          expensesGroupedByName.map((item, index) => (
+            <View
+              key={index}
+              className="bg-white p-4 rounded-md shadow-md mt-4"
+            >
+              <Text className="font-bold text-gray-700">Name: {item.name}</Text>
+              <Text className="text-gray-700">Amount: ${item.amount}</Text>
+            </View>
+          ))
+        ) : (
+          <Text className="text-gray-600 mt-2">
+            No data available for expenses by name.
+          </Text>
+        )}
+      </View>
+
+      {/* Total Expense Till Date */}
+      <View className="mt-6">
+        <Text className="text-lg font-semibold text-gray-800">
+          Total Expenses Till Date
+        </Text>
+        {totalExpenseTillDate ? (
+          <View className="bg-white p-4 rounded-md shadow-md">
+            <Text className="text-gray-700">
+              Total Expense: ${totalExpenseTillDate.totalExpense}
+            </Text>
+          </View>
+        ) : (
+          <Text className="text-gray-600 mt-2">
+            Total expense data is not available.
+          </Text>
+        )}
+      </View>
+
+      <Button title="Refresh Data" onPress={() => setLoading(true)} />
+    </ScrollView>
+  );
+};
+
+export default Dashboard;

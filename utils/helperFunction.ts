@@ -12,7 +12,13 @@ export const fetchData = async (url: string) => {
     throw new Error(error.message);
   }
 };
-export const placeOrder = async (url: string, orderData: []) => {
+export const placeOrder = async (
+  url: string,
+  orderData: {
+    userId: number;
+    products: { productId: number; productQuantity: number }[];
+  },
+) => {
   try {
     const response = await axios.post(url, orderData, {
       headers: {

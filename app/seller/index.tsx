@@ -88,8 +88,6 @@ export default function Sellers() {
           "Failed to add seller. Please try again.",
       );
     }
-  };
-  const handleDeleteSeller = (id: number) => {
     setSellers(sellers.filter((seller) => seller.id !== id));
   };
 
@@ -118,19 +116,24 @@ export default function Sellers() {
       ) : (
         // Sellers List
         <View className="mb-4">
-          <Text className="text-xl font-bold text-gray-800 mb-2">
-            Seller List
-          </Text>
+          <View className="flex-row justify-between items-center">
+            <Text className="text-xl font-bold text-gray-800 mb-2">
+              Seller List
+            </Text>
+            {/* Header with Add Icon */}
+            <TouchableOpacity onPress={() => setIsFormVisible(true)}>
+              <Ionicons name="add-circle" size={32} color="#4CAF50" />
+            </TouchableOpacity>
+          </View>
           {sellers.map((seller) => (
             <View
-              key={seller.id}
+              key={seller.user_id}
               className="flex-row justify-between items-center bg-white p-3 mb-2 rounded-lg shadow"
             >
               <View>
                 <Text className="text-base font-bold text-gray-900">
                   {seller.name}
                 </Text>
-                <Text className="text-sm text-gray-500">{seller.phone}</Text>
               </View>
               <TouchableOpacity onPress={() => handleDeleteSeller(seller.id)}>
                 <Ionicons name="trash-outline" size={24} color="red" />
@@ -195,14 +198,6 @@ export default function Sellers() {
           </View>
         </View>
       </Modal>
-
-      {/* Header with Add Icon */}
-      <TouchableOpacity
-        onPress={() => setIsFormVisible(true)}
-        className="absolute top-4 right-4 bg-blue-500 p-3 rounded-full"
-      >
-        <Ionicons name="add" size={24} color="white" />
-      </TouchableOpacity>
     </ScrollView>
   );
 }

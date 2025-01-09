@@ -30,6 +30,7 @@ export const CacheProvider = ({ children }: { children: ReactNode }) => {
 export const useCache = (): CacheContextType => {
   const context = useContext(CacheContext);
   if (!context) {
+
     throw new Error("useCache must be used within a CacheProvider");
   }
   return context;

@@ -46,7 +46,7 @@ export default function App() {
           <View className="login justify-centeri items-center">
             {" "}
             {isLoggedIn ? (
-              <TouchableOpacity>
+              <TouchableOpacity onPress={() => router.push("profile")}>
                 <View className="h-12 w-12 rounded-[100%] border border-solid border-black   items-center justify-center -mt-2">
                   <Avatar
                     rounded

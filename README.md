@@ -3,11 +3,6 @@
 Breado App is a comprehensive bakery inventory and payments record management system. It simplifies the process of managing bakery stock and tracking payments through an intuitive app built with React Native and Expo Router.
 
 ---
-![breado-before-login](https://github.com/user-attachments/assets/3915afc5-8e3d-4944-840a-1777e7494404)
-![breado-after-login](https://github.com/user-attachments/assets/3729e1d9-28dc-46bd-b058-584f2337dfae)
-![breado-side-bar](https://github.com/user-attachments/assets/c390a527-3094-4e99-b5a8-1b1243ca5959)![breado-place-order](https://github.com/user-attachments/assets/c9651d64-9946-41f0-a0b4-e646cbc3a85d)
-![breado-records](https://github.com/user-attachments/assets/615febc0-9f5d-4549-8879-826255fec8f3)
-
 
 ## Features
 
@@ -35,6 +30,18 @@ Breado App is a comprehensive bakery inventory and payments record management sy
 
 - View inventory trends and payment histories.
 - Graphical representations for better insights.
+
+---
+
+## Screenshots
+
+<div style="display: flex; flex-wrap: wrap; gap: 10px;">
+  <img src="https://github.com/user-attachments/assets/3915afc5-8e3d-4944-840a-1777e7494404" alt="breado-before-login" style="width: 30%;">
+  <img src="https://github.com/user-attachments/assets/3729e1d9-28dc-46bd-b058-584f2337dfae" alt="breado-after-login" style="width: 30%;">
+  <img src="https://github.com/user-attachments/assets/c390a527-3094-4e99-b5a8-1b1243ca5959" alt="breado-side-bar" style="width: 30%;">
+  <img src="https://github.com/user-attachments/assets/c9651d64-9946-41f0-a0b4-e646cbc3a85d" alt="breado-place-order" style="width: 30%;">
+  <img src="https://github.com/user-attachments/assets/615febc0-9f5d-4549-8879-826255fec8f3" alt="breado-records" style="width: 30%;">
+</div>
 
 ---
 
